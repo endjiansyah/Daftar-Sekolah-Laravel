@@ -8,6 +8,7 @@ use App\Enums\RegistrationStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeRegistrationMail;
@@ -178,16 +179,20 @@ class RegistrationController extends Controller
      * Mengubah password.
      */
     public function updatePassword(Request $request)
-    {
-        $request->validate([
-            'current_password' => 'required|current_password',
-            'password'         => 'required|confirmed|min:8',
-        ]);
+{
+    $request->validate([
+        'current_password' => ['required', 'current_password'],
+        'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::min(8)],
+    ], [
+        'current_password.current_password' => 'Password lama salah.',
+        'password.confirmed' => 'Konfirmasi password baru tidak cocok.'
+    ]);
 
-        Auth::user()->update([
-            'password' => Hash::make($request->password)
-        ]);
+    $request->user()->update([
+        'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+    ]);
 
-        return back()->with('success', 'Password berhasil diubah!');
-    }
+    // Menggunakan back() agar kembali ke halaman asal (Admin tetap di Admin, Siswa tetap di Siswa)
+    return back()->with('success_password', 'Password berhasil diperbarui!');
+}
 }

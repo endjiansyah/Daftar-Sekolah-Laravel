@@ -52,27 +52,22 @@ Route::middleware('guest')->group(function () {
 // --- 2. AKSES TERAUTENTIKASI (HARUS LOGIN) ---
 Route::middleware('auth')->group(function () {
 
+    // --- FITUR UMUM (Bisa diakses Siswa & Admin) ---
+    // Taruh di sini agar Admin juga bisa ganti password
+    Route::put('/profile/password', [RegistrationController::class, 'updatePassword'])->name('profile.password');
+
     // --- AREA SISWA (Role: Student) ---
     Route::middleware('role:student')->group(function () {
-
         Route::get('/dashboard', function () {
-            // Tambahkan relasi birthCity agar nama kota muncul di dashboard
-            $user = Auth::user()->load(['parentDetail', 'schoolDetail.city', 'birthCity']);
-            return view('dashboard', compact('user'));
+            Auth::user()->load(['parentDetail', 'schoolDetail.city', 'birthCity']);
+            return view('dashboard');
         })->name('dashboard');
 
-        // Ubah nama route dari 'student.edit' menjadi 'profile.edit' agar sesuai dengan View Dashboard
         Route::get('/dashboard/edit', [RegistrationController::class, 'edit'])->name('profile.edit');
-
-        // Update data menggunakan PUT (Sesuai dengan @method('PUT') di view nanti)
         Route::put('/profile/update', [RegistrationController::class, 'updateProfile'])->name('profile.update');
-
-        Route::put('/profile/password', [RegistrationController::class, 'updatePassword'])->name('profile.password');
     });
 
-    /**
-     * --- AREA ADMIN (Role: Admin) ---
-     */
+    // --- AREA ADMIN (Role: Admin) ---
     Route::middleware('role:admin')->prefix('admin')->group(function () {
         Route::get('/dashboard', [VerificationController::class, 'index'])->name('admin.dashboard');
         Route::patch('/verify/{user}/{status}', [VerificationController::class, 'updateStatus'])->name('admin.verify');
