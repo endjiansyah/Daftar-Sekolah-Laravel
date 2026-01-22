@@ -97,7 +97,6 @@ class RegistrationController extends Controller
             DB::commit();
             Auth::login($user);
             return redirect()->route('dashboard');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->withErrors(['error' => $e->getMessage()]);
@@ -109,8 +108,11 @@ class RegistrationController extends Controller
      */
     public function edit()
     {
-        $user = Auth::user()->load(['parentDetail', 'schoolDetail.city']);
-        $cities = City::orderBy('name', 'asc')->get();
+        // Mengambil user yang sedang login beserta semua detailnya
+        $user = auth()->user()->load(['parentDetail', 'schoolDetail', 'birthCity']);
+
+        // Mengambil data kota untuk dropdown
+        $cities = \App\Models\City::orderBy('name', 'asc')->get();
 
         return view('student.edit', compact('user', 'cities'));
     }
@@ -124,17 +126,20 @@ class RegistrationController extends Controller
 
         $request->validate([
             'full_name'    => 'required|string',
-            'nisn'         => 'required|numeric|digits:10',
-            'pob'          => 'required|exists:cities,id', // ID Kota tempat lahir
+            'nisn'         => 'required|digits:10',
+            'pob'          => 'required|exists:cities,id', // Validasi ID Kota
             'dob'          => 'required|date',
-            'city_id'      => 'required|exists:cities,id', // ID Kota sekolah
-            'school_name'  => 'required',
+            'phone_number' => 'required',
+            'address'      => 'required',
             'parent_name'  => 'required',
             'parent_phone' => 'required',
+            'city_id'      => 'required|exists:cities,id', // Kota Sekolah
+            'school_name'  => 'required',
         ]);
 
         try {
             DB::transaction(function () use ($user, $request) {
+                // Update Biodata Utama
                 $user->update([
                     'full_name'    => $request->full_name,
                     'nisn'         => $request->nisn,
@@ -145,11 +150,13 @@ class RegistrationController extends Controller
                     'address'      => $request->address,
                 ]);
 
+                // Update/Create Detail Ortu
                 $user->parentDetail()->updateOrCreate(
                     ['user_id' => $user->id],
                     $request->only(['parent_name', 'relationship', 'parent_phone', 'parent_email'])
                 );
 
+                // Update/Create Detail Sekolah
                 $user->schoolDetail()->updateOrCreate(
                     ['user_id' => $user->id],
                     [
@@ -161,9 +168,9 @@ class RegistrationController extends Controller
                 );
             });
 
-            return redirect()->route('dashboard')->with('success', 'Data berhasil diperbarui!');
+            return redirect()->route('dashboard')->with('success', 'Profil berhasil dilengkapi!');
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Gagal menyimpan data: ' . $e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Gagal update: ' . $e->getMessage()]);
         }
     }
 

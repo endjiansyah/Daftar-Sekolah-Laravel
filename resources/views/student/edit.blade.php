@@ -3,103 +3,160 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lengkapi Data Siswa - PPDB</title>
+    <title>Lengkapi Profil - PPDB Online</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+    <style>
+        body { background-color: #f4f7f6; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        .section-title { color: #0d6efd; font-weight: bold; border-left: 4px solid #0d6efd; padding-left: 10px; margin-bottom: 20px; }
+        .required-info { font-size: 0.85rem; color: #dc3545; }
+    </style>
 </head>
-<body class="bg-light">
+<body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm mb-4">
-        <div class="container">
-            <span class="navbar-brand fw-bold text-warning">PENGATURAN DATA</span>
-            <a href="{{ route('dashboard') }}" class="btn btn-outline-light btn-sm fw-bold">
-                <i class="bi bi-arrow-left"></i> Kembali ke Dashboard
-            </a>
-        </div>
-    </nav>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold mb-1">Lengkapi Profil Pendaftaran</h3>
+                    <p class="required-info">* Tanda bintang merah wajib diisi</p>
+                </div>
+                <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary">Kembali</a>
+            </div>
 
-    <div class="container pb-5">
-        <div class="row justify-content-center">
-            <div class="col-md-9">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white py-3 border-bottom">
-                        <h5 class="fw-bold mb-0 text-primary">Formulir Pendaftaran</h5>
-                    </div>
-                    <div class="card-body p-4">
-                        <form action="{{ route('profile.update') }}" method="POST">
-                            @csrf
-                            
-                            <h6 class="fw-bold mb-3"><i class="bi bi-1-circle-fill me-2"></i>IDENTITAS DASAR</h6>
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-6">
-                                    <label class="small fw-bold">NISN</label>
-                                    <input type="text" name="nisn" class="form-control" value="{{ old('nisn', $user->nisn) }}" placeholder="10 Digit NISN">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="small fw-bold">Jenis Kelamin</label>
-                                    <select name="gender" class="form-select">
-                                        <option value="" disabled selected>Pilih...</option>
-                                        <option value="L" {{ $user->gender == 'L' ? 'selected' : '' }}>Laki-laki</option>
-                                        <option value="P" {{ $user->gender == 'P' ? 'selected' : '' }}>Perempuan</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-12">
-                                    <label class="small fw-bold">Alamat Lengkap</label>
-                                    <textarea name="address" class="form-control" rows="2">{{ old('address', $user->address) }}</textarea>
-                                </div>
-                            </div>
+            @if($errors->any())
+                <div class="alert alert-danger shadow-sm border-0">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-                            <hr>
+            <form action="{{ route('profile.update') }}" method="POST">
+                @csrf
+                @method('PUT')
 
-                            <h6 class="fw-bold mb-3 mt-4"><i class="bi bi-2-circle-fill me-2"></i>DATA ORANG TUA / WALI</h6>
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-6">
-                                    <label class="small fw-bold">Nama Lengkap Wali</label>
-                                    <input type="text" name="parent_name" class="form-control" value="{{ old('parent_name', $user->parentDetail->parent_name ?? '') }}" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="small fw-bold">Hubungan</label>
-                                    <select name="relationship" class="form-select">
-                                        <option value="Ayah" {{ ($user->parentDetail->relationship ?? '') == 'Ayah' ? 'selected' : '' }}>Ayah</option>
-                                        <option value="Ibu" {{ ($user->parentDetail->relationship ?? '') == 'Ibu' ? 'selected' : '' }}>Ibu</option>
-                                        <option value="Wali" {{ ($user->parentDetail->relationship ?? '') == 'Wali' ? 'selected' : '' }}>Wali</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-12">
-                                    <label class="small fw-bold">Nomor WhatsApp Aktif</label>
-                                    <input type="text" name="parent_phone" class="form-control" value="{{ old('parent_phone', $user->parentDetail->parent_phone ?? '') }}" required>
-                                </div>
-                            </div>
-
-                            <hr>
-
-                            <h6 class="fw-bold mb-3 mt-4"><i class="bi bi-3-circle-fill me-2"></i>SEKOLAH ASAL</h6>
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-12">
-                                    <label class="small fw-bold">Nama SMP / MTs</label>
-                                    <input type="text" name="school_name" class="form-control" value="{{ old('school_name', $user->schoolDetail->school_name ?? '') }}" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="small fw-bold">Kota/Kabupaten Sekolah</label>
-                                    <input type="text" name="city" class="form-control" value="{{ old('city', $user->schoolDetail->city ?? '') }}" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="small fw-bold">Tahun Lulus</label>
-                                    <input type="number" name="graduation_year" class="form-control" value="{{ old('graduation_year', $user->schoolDetail->graduation_year ?? '2025') }}" required>
-                                </div>
-                            </div>
-
-                            <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">
-                                    <i class="bi bi-check2-circle me-1"></i> SIMPAN DAN PERBARUI DATA
-                                </button>
-                            </div>
-                        </form>
+                <div class="card p-4">
+                    <h5 class="section-title">A. Identitas Pribadi Siswa</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Nama Lengkap <span class="text-danger">*</span></label>
+                            <input type="text" name="full_name" class="form-control" value="{{ old('full_name', $user->full_name) }}" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">NISN <span class="text-danger">*</span></label>
+                            <input type="text" name="nisn" class="form-control" value="{{ old('nisn', $user->nisn) }}" maxlength="10">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Jenis Kelamin <span class="text-danger">*</span></label>
+                            <select name="gender" class="form-select">
+                                <option value="L" {{ old('gender', $user->gender) == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                                <option value="P" {{ old('gender', $user->gender) == 'P' ? 'selected' : '' }}>Perempuan</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Tempat Lahir <span class="text-danger">*</span></label>
+                            <select name="pob" class="form-select select2-city">
+                                @foreach($cities as $city)
+                                    <option value="{{ $city->id }}" {{ old('pob', $user->pob) == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Tanggal Lahir <span class="text-danger">*</span></label>
+                            <input type="date" name="dob" class="form-control" 
+                                   value="{{ old('dob', ($user->dob ? $user->dob->format('Y-m-d') : '')) }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">No. WhatsApp Aktif <span class="text-danger">*</span></label>
+                            <input type="text" name="phone_number" class="form-control" value="{{ old('phone_number', $user->phone_number) }}">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Alamat Lengkap Rumah <span class="text-danger">*</span></label>
+                            <textarea name="address" class="form-control" rows="2">{{ old('address', $user->address) }}</textarea>
+                        </div>
                     </div>
                 </div>
-            </div>
+
+                <div class="card p-4">
+                    <h5 class="section-title">B. Data Orang Tua / Wali</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Nama Orang Tua / Wali <span class="text-danger">*</span></label>
+                            <input type="text" name="parent_name" class="form-control" value="{{ old('parent_name', $user->parentDetail->parent_name ?? '') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Email Orang Tua</label>
+                            <input type="email" name="parent_email" class="form-control" value="{{ old('parent_email', $user->parentDetail->parent_email ?? '') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Hubungan / Status <span class="text-danger">*</span></label>
+                            @php $rel = old('relationship', $user->parentDetail->relationship ?? ''); @endphp
+                            <select name="relationship" class="form-select">
+                                <option value="" disabled {{ $rel == '' ? 'selected' : '' }}>-- Pilih Hubungan --</option>
+                                <option value="Ayah" {{ $rel == 'Ayah' ? 'selected' : '' }}>Ayah Kandung</option>
+                                <option value="Ibu" {{ $rel == 'Ibu' ? 'selected' : '' }}>Ibu Kandung</option>
+                                <option value="Wali" {{ $rel == 'Wali' ? 'selected' : '' }}>Wali</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">No. WA Orang Tua <span class="text-danger">*</span></label>
+                            <input type="text" name="parent_phone" class="form-control" value="{{ old('parent_phone', $user->parentDetail->parent_phone ?? '') }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-4">
+                    <h5 class="section-title">C. Informasi Sekolah Asal</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Nama Sekolah (SMP/MTs) <span class="text-danger">*</span></label>
+                            <input type="text" name="school_name" class="form-control" value="{{ old('school_name', $user->schoolDetail->school_name ?? '') }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Kota/Kabupaten Sekolah <span class="text-danger">*</span></label>
+                            @php $scCity = old('city_id', $user->schoolDetail->city_id ?? ''); @endphp
+                            <select name="city_id" class="form-select select2-city">
+                                @foreach($cities as $city)
+                                    <option value="{{ $city->id }}" {{ $scCity == $city->id ? 'selected' : '' }}>{{ $city->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Tahun Lulus <span class="text-danger">*</span></label>
+                            <input type="number" name="graduation_year" class="form-control" value="{{ old('graduation_year', $user->schoolDetail->graduation_year ?? 2025) }}">
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">Alamat Sekolah Asal</label>
+                            <textarea name="school_address" class="form-control" rows="2">{{ old('school_address', $user->schoolDetail->school_address ?? '') }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end mt-4 mb-5">
+                    <button type="submit" class="btn btn-primary shadow-sm">
+                        Simpan Perubahan Data
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.select2-city').select2({
+            theme: 'bootstrap-5',
+            placeholder: '-- Pilih Kota --'
+        });
+    });
+</script>
 </body>
 </html>

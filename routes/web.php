@@ -52,25 +52,21 @@ Route::middleware('guest')->group(function () {
 // --- 2. AKSES TERAUTENTIKASI (HARUS LOGIN) ---
 Route::middleware('auth')->group(function () {
 
-    /**
-     * --- AREA SISWA (Role: Student) ---
-     */
+    // --- AREA SISWA (Role: Student) ---
     Route::middleware('role:student')->group(function () {
 
-        // Menampilkan Dashboard Utama
         Route::get('/dashboard', function () {
-            $user = Auth::user()->load(['parentDetail', 'schoolDetail']);
+            // Tambahkan relasi birthCity agar nama kota muncul di dashboard
+            $user = Auth::user()->load(['parentDetail', 'schoolDetail.city', 'birthCity']);
             return view('dashboard', compact('user'));
         })->name('dashboard');
 
-        // Menampilkan Form untuk Lengkapi atau Edit Data
-        Route::get('/dashboard/edit', [RegistrationController::class, 'edit'])->name('student.edit');
+        // Ubah nama route dari 'student.edit' menjadi 'profile.edit' agar sesuai dengan View Dashboard
+        Route::get('/dashboard/edit', [RegistrationController::class, 'edit'])->name('profile.edit');
 
-        // Memproses pengiriman data profil, ortu, dan sekolah (Update)
-        // Disinkronkan menggunakan PUT agar sesuai dengan standar update data di Controller
+        // Update data menggunakan PUT (Sesuai dengan @method('PUT') di view nanti)
         Route::put('/profile/update', [RegistrationController::class, 'updateProfile'])->name('profile.update');
 
-        // Memproses perubahan password
         Route::put('/profile/password', [RegistrationController::class, 'updatePassword'])->name('profile.password');
     });
 

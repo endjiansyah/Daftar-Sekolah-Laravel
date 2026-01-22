@@ -9,22 +9,40 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     protected $fillable = [
-        'username', 'email', 'password', 'full_name', 'nisn', 
-        'gender', 'phone_number', 'pob', 'dob', 'address', 'role', 'status'
+        'username',
+        'email',
+        'password',
+        'full_name',
+        'nisn',
+        'gender',
+        'phone_number',
+        'pob',
+        'dob',
+        'address',
+        'role',
+        'status'
     ];
 
     protected $casts = [
         // Pastikan mengarah ke RegistrationStatus
-        'status' => RegistrationStatus::class, 
+        'status' => RegistrationStatus::class,
         'role' => UserRole::class,
         'dob' => 'date',
     ];
 
-    public function parentDetail() {
+    // Tambahkan di dalam class User
+    public function birthCity()
+    {
+        return $this->belongsTo(City::class, 'pob', 'id');
+    }
+
+    public function parentDetail()
+    {
         return $this->hasOne(ParentDetail::class);
     }
 
-    public function schoolDetail() {
+    public function schoolDetail()
+    {
         return $this->hasOne(SchoolDetail::class);
     }
 }
