@@ -2,29 +2,29 @@
 
 namespace App\Models;
 
-use App\Enums\UserRole;
-use App\Enums\RegistrationStatus;
+use App\Enums\RegistrationStatus; //
+use App\Enums\UserRole; //
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use Notifiable;
-
     protected $fillable = [
-        'username', 'email', 'password', 'full_name', 
-        'nisn', 'gender', 'pob', 'dob', 'address', 'role', 'status'
+        'username', 'email', 'password', 'full_name', 'nisn', 
+        'gender', 'phone_number', 'pob', 'dob', 'address', 'role', 'status'
     ];
-
-    protected $hidden = ['password', 'remember_token'];
 
     protected $casts = [
-        'password' => 'hashed',
+        // Pastikan mengarah ke RegistrationStatus
+        'status' => RegistrationStatus::class, 
         'role' => UserRole::class,
-        'status' => RegistrationStatus::class,
+        'dob' => 'date',
     ];
 
-    // Relasi agar tidak error saat memanggil di Dashboard
-    public function parentDetail() { return $this->hasOne(ParentDetail::class); }
-    public function schoolDetail() { return $this->hasOne(SchoolDetail::class); }
+    public function parentDetail() {
+        return $this->hasOne(ParentDetail::class);
+    }
+
+    public function schoolDetail() {
+        return $this->hasOne(SchoolDetail::class);
+    }
 }

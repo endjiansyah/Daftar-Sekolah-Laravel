@@ -21,7 +21,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', function () {
         return view('auth.register');
     })->name('register');
-    
+
     Route::post('/register', [RegistrationController::class, 'store'])->name('register.store');
 
     // Login
@@ -37,9 +37,12 @@ Route::middleware('guest')->group(function () {
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            
-            // Redirect otomatis berdasarkan role
-            return auth()->user()->role->value === 'admin' 
+
+            // Redirect otomatis berdasarkan role (Menggunakan Enum value jika perlu)
+            $role = auth()->user()->role;
+            $roleValue = is_object($role) ? $role->value : $role;
+
+            return $roleValue === 'admin'
                 ? redirect()->intended('/admin/dashboard')
                 : redirect()->intended('/dashboard');
         }
@@ -52,14 +55,26 @@ Route::middleware('guest')->group(function () {
 // --- AKSES TERAUTENTIKASI (HARUS LOGIN) ---
 Route::middleware('auth')->group(function () {
 
-    // 1. AREA SISWA (Role: Student)
+    /**
+     * --- AREA SISWA (Role: Student) ---
+     * Kelompok route yang hanya bisa diakses oleh user dengan role student.
+     */
     Route::middleware('role:student')->group(function () {
+
+        // Menampilkan Dashboard Utama (Halaman Monitoring/Overview)
         Route::get('/dashboard', function () {
             $user = Auth::user()->load(['parentDetail', 'schoolDetail']);
             return view('dashboard', compact('user'));
         })->name('dashboard');
 
-        Route::post('/complete-profile', [RegistrationController::class, 'completeProfile'])->name('profile.complete');
+        // Menampilkan Form untuk Lengkapi atau Edit Data
+        Route::get('/dashboard/edit', [RegistrationController::class, 'edit'])->name('student.edit');
+
+        // Memproses pengiriman data profil, ortu, dan sekolah (POST)
+        Route::post('/profile/update', [RegistrationController::class, 'updateProfile'])->name('profile.update');
+
+        // Memproses perubahan password (PUT)
+        Route::put('/profile/password', [RegistrationController::class, 'updatePassword'])->name('profile.password');
     });
 
     // 2. AREA ADMIN (Role: Admin)
@@ -68,7 +83,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('/verify/{user}/{status}', [VerificationController::class, 'updateStatus'])->name('admin.verify');
     });
 
-    // 3. LOGOUT (Tersedia untuk semua role yang login)
+    // 3. LOGOUT
     Route::post('/logout', function () {
         Auth::logout();
         request()->session()->invalidate();

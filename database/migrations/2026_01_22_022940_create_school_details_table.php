@@ -9,14 +9,19 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('school_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relasi ke tabel users
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('school_name');
             $table->text('school_address');
-            $table->string('city');
+
+            $table->foreignId('city_id')
+                ->nullable()
+                ->constrained('cities')
+                ->onDelete('set null');
+
             $table->year('graduation_year');
             $table->timestamps();
         });

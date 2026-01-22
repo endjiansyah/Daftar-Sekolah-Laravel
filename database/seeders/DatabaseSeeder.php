@@ -22,14 +22,9 @@ class DatabaseSeeder extends Seeder
             'status' => RegistrationStatus::TERVERIFIKASI,
         ]);
 
-        // 2. Buat Akun Siswa Contoh (Opsional)
-        User::create([
-            'username' => 'siswasample',
-            'email' => 'siswa@gmail.com',
-            'password' => Hash::make('semuasama123'),
-            'full_name' => 'Budi Santoso',
-            'role' => UserRole::STUDENT,
-            'status' => RegistrationStatus::DAFTAR,
+        $this->call([
+            CitySeeder::class, // Panggil seeder kota di sini
+            // UserSeeder::class, (Jika ada)
         ]);
     }
 }

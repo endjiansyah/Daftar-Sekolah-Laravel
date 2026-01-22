@@ -13,19 +13,22 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('username')->unique();
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->string('full_name');
-            $table->string('nisn', 10)->nullable(); // Field Baru
-            $table->enum('gender', ['L', 'P'])->nullable(); // Field Baru
-            $table->string('pob')->nullable(); // Field Baru
-            $table->date('dob')->nullable(); // Field Baru
-            $table->text('address')->nullable(); // Field Baru
-            $table->string('role')->default('student');
-            $table->string('status')->default('daftar');
-            $table->rememberToken();
-            $table->timestamps();
+            $table->string('username')->unique(); 
+            $table->string('email')->unique(); 
+            $table->string('password'); 
+            $table->string('full_name'); 
+            $table->string('nisn', 10)->nullable(); 
+            $table->enum('gender', ['L', 'P'])->nullable(); 
+            $table->string('phone_number')->nullable(); 
+            $table->string('pob')->nullable(); 
+            $table->date('dob')->nullable(); 
+            $table->text('address')->nullable(); 
+            $table->string('role')->default('student'); 
+
+            $table->string('status')->default('DAFTAR');
+
+            $table->rememberToken(); 
+            $table->timestamps(); 
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
