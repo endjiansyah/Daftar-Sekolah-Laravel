@@ -2,79 +2,60 @@
 
 # Web Pendaftaran Sekolah (PPDB Online) - Technical Assessment
 
-Project ini dikembangkan sebagai bagian dari penilaian teknis untuk sistem pendaftaran siswa baru menggunakan **Laravel 12**.
+Project ini dikembangkan sebagai sistem manajemen pendaftaran siswa baru menggunakan **Laravel 12**. Sistem ini mengintegrasikan alur pendaftaran mandiri oleh siswa dan sistem verifikasi satu pintu oleh admin.
 
 ## 🚀 Fitur Utama & Arsitektur
-- **Dual-Mode Registration**: 
-  - *Partial*: Siswa dapat mendaftar hanya dengan data akun dasar.
-  - *Complete*: Pendaftaran satu pintu yang mencakup data pribadi, orang tua, dan sekolah asal.
-- **Dynamic Dashboard**: Dashboard yang mendeteksi kelengkapan profil. Jika data belum lengkap (akibat pendaftaran parsial), sistem akan menyediakan form integrasi untuk melengkapi data.
-- **State Management dengan PHP Enums**: Menggunakan Enum (PHP 8.2+) untuk mengelola `RegistrationStatus` (DAFTAR, TERVERIFIKASI, DITOLAK) dan `UserRole` guna menjamin tipe data yang kuat (Type-safety).
-- **Database Integrity**: Menggunakan `DB::transaction` pada proses pendaftaran guna memastikan data di 3 tabel berbeda tetap sinkron dan mencegah data sampah (partial data) jika terjadi error.
-- **Admin Verification System**: Dashboard khusus admin untuk memproses pendaftaran, memantau kelengkapan data sekolah/orang tua, dan merubah status pendaftaran secara real-time.
+- **Dual-Mode Registration**: Mendukung pendaftaran parsial (akun) maupun lengkap (biodata terintegrasi).
+- **State Management (Enums)**: Menggunakan PHP Enums untuk integritas status pendaftaran (DAFTAR, TERVERIFIKASI, DITOLAK).
+- **Database Transaction**: Memastikan atomisitas data saat pendaftaran siswa yang melibatkan 3 tabel (Users, Parent, School).
+- **Admin Management**: Dashboard admin dengan fitur *real-time status update* (Verifikasi, Tolak, dan Reset Status).
+
+## 📂 Pemetaan Struktur Data & Logika
+Berikut adalah rincian file utama berdasarkan arsitektur **MVC (Model-View-Controller)**:
+
+### 1. Database (Migrations & Seeders)
+Menangani struktur tabel dan data awal untuk keperluan pengujian.
+- `database/migrations/`: 
+    - `users`: Tabel utama (Auth, NISN, Data Pribadi).
+    - `parent_details`: Relasi 1:1 data orang tua/wali.
+    - `school_details`: Relasi 1:1 data sekolah asal.
+    - `cities`: Referensi data wilayah untuk tempat lahir dan lokasi sekolah.
+- `database/seeders/DatabaseSeeder.php`: Menginisialisasi user Admin, Siswa contoh, dan data wilayah (Cities).
+
+### 2. Models (Data Definitions)
+Mengatur relasi Eloquent antar entitas.
+- `app/Models/User.php`: Memiliki relasi `hasOne` ke `ParentDetail` dan `SchoolDetail`.
+- `app/Enums/RegistrationStatus.php`: Definisi status pendaftaran berbasis String.
+
+### 3. Controllers (Business Logic)
+Pusat kendali alur data aplikasi.
+- `app/Http/Controllers/Auth/RegisteredUserController.php`: Logika pendaftaran siswa menggunakan `DB::transaction`.
+- `app/Http/Controllers/Admin/VerificationController.php`: Logika khusus admin untuk mengubah status pendaftaran (`updateStatus`).
+
+### 4. Views (User Interface)
+Menggunakan **Blade Templating** dan **Bootstrap 5**.
+- `resources/views/admin/dashboard.blade.php`: Interface pengelolaan siswa dengan sistem Modal detail dan Quick Action.
+- `resources/views/dashboard.blade.php`: Interface dashboard siswa (dinamis berdasarkan kelengkapan profil).
+
+
 
 ## 🛠️ Langkah Instalasi
 1. Clone repositori ini.
 2. Jalankan `composer install`.
-3. Salin file `.env.example` menjadi `.env` dan sesuaikan konfigurasi database Anda.
-4. Jalankan `php artisan key:generate`.
-5. Jalankan migrasi beserta data awal (seeder):
+3. Salin `.env.example` menjadi `.env` dan konfigurasi database.
+4. Jalankan perintah:
    ```bash
+   php artisan key:generate
    php artisan migrate --seed
-6. Jalankan server lokal: php artisan serve.
+5. Jalankan server: php artisan serve.
 
-🔑 Akun Akses
-Admin: admin@sma.sch.id | Password: semuasama123
-Siswa (Contoh): siswa@gmail.com | Password: semuasama123
+## 🔑 Akun Akses (Seeded Data)
+Role	Email	Password
+Admin	admin@sma.sch.id	semuasama123
 
+## 🛠 Panduan Perbaikan/Reset Data
+Jika Anda melakukan testing dan ingin mengosongkan data atau mengulang status:
 
-## About Laravel
+Reset Status: Gunakan tombol "Reset" pada Dashboard Admin untuk mengubah status TERVERIFIKASI atau DITOLAK kembali menjadi DAFTAR.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Refresh Database: Jalankan php artisan migrate:fresh --seed untuk mengembalikan database ke kondisi awal.
