@@ -15,6 +15,15 @@ Route::get('/register', function () {
 })->name('register');
 
 Route::get('/dashboard', function () {
-    $user = Auth::user();
-    return "Selamat datang, " . $user->full_name . ". Status pendaftaran Anda: " . $user->status->value;
+    $user = Auth::user()->load(['parentDetail', 'schoolDetail']); // Eager loading agar tidak berat
+    return view('dashboard', compact('user'));
 })->middleware(['auth'])->name('dashboard');
+
+Route::post('/complete-profile', [RegistrationController::class, 'completeProfile'])->name('profile.complete');
+
+Route::post('/logout', function () {
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/register');
+})->name('logout');
