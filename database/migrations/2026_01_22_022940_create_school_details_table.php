@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('school_details', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relasi ke tabel users
+            $table->string('school_name');
+            $table->text('school_address');
+            $table->string('city');
+            $table->year('graduation_year');
             $table->timestamps();
         });
     }

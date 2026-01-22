@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('parent_details', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Relasi ke tabel users
+            $table->string('parent_name');
+            $table->string('relationship'); // Ayah/Ibu/Wali
+            $table->string('parent_phone');
+            $table->string('parent_email')->nullable();
             $table->timestamps();
         });
     }
