@@ -11,6 +11,7 @@ Project ini dikembangkan sebagai bagian dari penilaian teknis untuk sistem penda
 - **Dynamic Dashboard**: Dashboard yang mendeteksi kelengkapan profil. Jika data belum lengkap (akibat pendaftaran parsial), sistem akan menyediakan form integrasi untuk melengkapi data.
 - **State Management dengan PHP Enums**: Menggunakan Enum (PHP 8.2+) untuk mengelola `RegistrationStatus` (DAFTAR, TERVERIFIKASI, DITOLAK) dan `UserRole` guna menjamin tipe data yang kuat (Type-safety).
 - **Database Integrity**: Menggunakan `DB::transaction` pada proses pendaftaran guna memastikan data di 3 tabel berbeda tetap sinkron dan mencegah data sampah (partial data) jika terjadi error.
+- **Admin Verification System**: Dashboard khusus admin untuk memproses pendaftaran, memantau kelengkapan data sekolah/orang tua, dan merubah status pendaftaran secara real-time.
 
 ## 🛠️ Langkah Instalasi
 1. Clone repositori ini.

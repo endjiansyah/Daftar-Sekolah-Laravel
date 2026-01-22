@@ -17,13 +17,13 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->string('full_name');
-            $table->string('gender')->nullable();
-            $table->string('place_of_birth')->nullable();
-            $table->date('date_of_birth')->nullable();
-            $table->string('phone_number')->nullable();
-            $table->text('address')->nullable();
+            $table->string('nisn', 10)->nullable(); // Field Baru
+            $table->enum('gender', ['L', 'P'])->nullable(); // Field Baru
+            $table->string('pob')->nullable(); // Field Baru
+            $table->date('dob')->nullable(); // Field Baru
+            $table->text('address')->nullable(); // Field Baru
             $table->string('role')->default('student');
-            $table->string('status')->default('DAFTAR');
+            $table->string('status')->default('daftar');
             $table->rememberToken();
             $table->timestamps();
         });

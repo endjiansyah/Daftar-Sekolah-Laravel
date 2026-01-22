@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pendaftaran Siswa Baru</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-light">
     <div class="container py-5">
         <div class="row justify-content-center">
@@ -17,7 +19,7 @@
                     <div class="card-body">
                         <form action="{{ route('register.store') }}" method="POST">
                             @csrf
-                            
+
                             <div class="mb-4">
                                 <label class="form-label d-block fw-bold">Tipe Pendaftaran</label>
                                 <div class="form-check form-check-inline">
@@ -45,13 +47,46 @@
                                     @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Nama Lengkap</label>
-                                <input type="text" name="full_name" class="form-control @error('full_name') is-invalid @enderror" value="{{ old('full_name') }}">
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Nama Lengkap</label>
+                                    <input type="text" name="full_name" class="form-control" value="{{ old('full_name') }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">NISN (10 Digit)</label>
+                                    <input type="text" name="nisn" class="form-control" placeholder="Contoh: 0012345678">
+                                </div>
                             </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Jenis Kelamin</label>
+                                    <select name="gender" class="form-select">
+                                        <option value="L">Laki-laki</option>
+                                        <option value="P">Perempuan</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" name="password" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Tempat Lahir</label>
+                                    <input type="text" name="pob" class="form-control" placeholder="Kota Lahir">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Tanggal Lahir</label>
+                                    <input type="date" name="dob" class="form-control">
+                                </div>
+                            </div>
+
                             <div class="mb-3">
-                                <label class="form-label">Password</label>
-                                <input type="password" name="password" class="form-control @error('password') is-invalid @enderror">
+                                <label class="form-label">Alamat Lengkap Siswa</label>
+                                <textarea name="address" class="form-control" rows="2"></textarea>
                             </div>
 
                             <div id="additional_fields" style="display: none;">
@@ -118,4 +153,5 @@
         typeComplete.addEventListener('change', toggleFields);
     </script>
 </body>
+
 </html>

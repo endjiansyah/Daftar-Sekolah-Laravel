@@ -43,12 +43,17 @@ class RegistrationController extends Controller
 
             // Simpan ke Tabel Users
             $user = User::create([
-                'username' => $validated['username'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
-                'full_name' => $validated['full_name'],
-                'role' => UserRole::STUDENT,
-                'status' => RegistrationStatus::DAFTAR,
+                'username'  => $request->username,
+                'email'     => $request->email,
+                'password'  => Hash::make($request->password),
+                'full_name' => $request->full_name,
+                'nisn'      => $request->nisn,
+                'gender'    => $request->gender,
+                'pob'       => $request->pob,
+                'dob'       => $request->dob,
+                'address'   => $request->address,
+                'role'      => 'student',
+                'status' => \App\Enums\RegistrationStatus::DAFTAR,
             ]);
 
             // Jika Complete, Simpan ke tabel pendukung
