@@ -11,17 +11,14 @@ use App\Http\Controllers\Admin\VerificationController;
 |--------------------------------------------------------------------------
 */
 
-// --- AKSES PUBLIK (GUEST) ---
+// --- 1. AKSES PUBLIK (GUEST) ---
 Route::get('/', function () {
     return view('welcome');
 });
 
 Route::middleware('guest')->group(function () {
     // Registrasi
-    Route::get('/register', function () {
-        return view('auth.register');
-    })->name('register');
-
+    Route::get('/register', [RegistrationController::class, 'create'])->name('register');
     Route::post('/register', [RegistrationController::class, 'store'])->name('register.store');
 
     // Login
@@ -38,7 +35,7 @@ Route::middleware('guest')->group(function () {
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            // Redirect otomatis berdasarkan role (Menggunakan Enum value jika perlu)
+            // Redirect otomatis berdasarkan role
             $role = auth()->user()->role;
             $roleValue = is_object($role) ? $role->value : $role;
 
@@ -52,16 +49,15 @@ Route::middleware('guest')->group(function () {
 });
 
 
-// --- AKSES TERAUTENTIKASI (HARUS LOGIN) ---
+// --- 2. AKSES TERAUTENTIKASI (HARUS LOGIN) ---
 Route::middleware('auth')->group(function () {
 
     /**
      * --- AREA SISWA (Role: Student) ---
-     * Kelompok route yang hanya bisa diakses oleh user dengan role student.
      */
     Route::middleware('role:student')->group(function () {
 
-        // Menampilkan Dashboard Utama (Halaman Monitoring/Overview)
+        // Menampilkan Dashboard Utama
         Route::get('/dashboard', function () {
             $user = Auth::user()->load(['parentDetail', 'schoolDetail']);
             return view('dashboard', compact('user'));
@@ -70,20 +66,23 @@ Route::middleware('auth')->group(function () {
         // Menampilkan Form untuk Lengkapi atau Edit Data
         Route::get('/dashboard/edit', [RegistrationController::class, 'edit'])->name('student.edit');
 
-        // Memproses pengiriman data profil, ortu, dan sekolah (POST)
-        Route::post('/profile/update', [RegistrationController::class, 'updateProfile'])->name('profile.update');
+        // Memproses pengiriman data profil, ortu, dan sekolah (Update)
+        // Disinkronkan menggunakan PUT agar sesuai dengan standar update data di Controller
+        Route::put('/profile/update', [RegistrationController::class, 'updateProfile'])->name('profile.update');
 
-        // Memproses perubahan password (PUT)
+        // Memproses perubahan password
         Route::put('/profile/password', [RegistrationController::class, 'updatePassword'])->name('profile.password');
     });
 
-    // 2. AREA ADMIN (Role: Admin)
+    /**
+     * --- AREA ADMIN (Role: Admin) ---
+     */
     Route::middleware('role:admin')->prefix('admin')->group(function () {
         Route::get('/dashboard', [VerificationController::class, 'index'])->name('admin.dashboard');
         Route::patch('/verify/{user}/{status}', [VerificationController::class, 'updateStatus'])->name('admin.verify');
     });
 
-    // 3. LOGOUT
+    // --- LOGOUT ---
     Route::post('/logout', function () {
         Auth::logout();
         request()->session()->invalidate();
