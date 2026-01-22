@@ -19,18 +19,18 @@ class VerificationController extends Controller
         return view('admin.dashboard', compact('students'));
     }
 
-    public function updateStatus(User $user, $statusId)
+    public function updateStatus(User $user, $status)
     {
-        // Validasi: Cek kelengkapan data sebelum verifikasi ke status 'DITERIMA' (ID: 2 misal)
-        // Jika status yang dituju adalah diterima (sesuaikan ID status di DB Anda)
-        if ($statusId == 2) { 
-            if (empty($user->nisn) || !$user->parentDetail || !$user->schoolDetail) {
-                return back()->with('error', 'Gagal! Data siswa belum lengkap untuk diverifikasi.');
-            }
+        // Cek apakah string yang dikirim sesuai dengan Enum (TERVERIFIKASI / DITOLAK)
+        try {
+            $user->update([
+                'status' => $status
+            ]);
+
+            $msg = $status == 'TERVERIFIKASI' ? 'Pendaftaran diterima!' : 'Pendaftaran ditolak.';
+            return back()->with('success', "Berhasil! Status {$user->full_name} kini {$msg}");
+        } catch (\Exception $e) {
+            return back()->with('error', "Gagal memperbarui status: " . $e->getMessage());
         }
-
-        $user->update(['status_id' => $statusId]);
-
-        return back()->with('success', 'Status pendaftaran berhasil diperbarui.');
     }
 }
