@@ -199,8 +199,8 @@
                                         </div>
                                         <div class="modal-body px-4 pb-4">
 
-                                            {{-- SECTION I: DATA PRIBADI --}}
-                                            <div class="section-tag">I. Data Pribadi & Akun</div>
+                                            {{-- SECTION I: DATA PRIBADI & AKADEMIK --}}
+                                            <div class="section-tag">I. Data Pribadi & Akademik</div>
                                             <div class="detail-item">
                                                 <div class="detail-label">Nama Lengkap</div>
                                                 <div class="detail-value">{{ $student->full_name }}</div>
@@ -212,6 +212,10 @@
                                             <div class="detail-item">
                                                 <div class="detail-label">NISN</div>
                                                 <div class="detail-value">{{ $student->nisn ?? '-' }}</div>
+                                            </div>
+                                            <div class="detail-item">
+                                                <div class="detail-label">Rata-rata Nilai</div>
+                                                <div class="detail-value fw-bold text-dark">{{ number_format($student->average_score ?? 0, 2) }}</div>
                                             </div>
                                             <div class="detail-item">
                                                 <div class="detail-label">Jenis Kelamin</div>
@@ -230,10 +234,10 @@
                                             </div>
                                             <div class="detail-item">
                                                 <div class="detail-label">Alamat Rumah</div>
-                                                <div class="detail-value">{{ $student->address ?? '-' }}</div>
+                                                <div class="detail-value small">{{ $student->address ?? '-' }}</div>
                                             </div>
 
-                                            {{-- SECTION II: DATA ORANG TUA --}}
+                                            {{-- SECTION II: DATA ORANG TUA / WALI --}}
                                             <div class="section-tag">II. Data Orang Tua / Wali</div>
                                             @if($student->parentDetail)
                                             <div class="detail-item">
@@ -249,15 +253,15 @@
                                                 <div class="detail-value">{{ $student->parentDetail->parent_phone }}</div>
                                             </div>
                                             <div class="detail-item">
-                                                <div class="detail-label">Email Ortu</div>
+                                                <div class="detail-label">Email Orang Tua</div>
                                                 <div class="detail-value">{{ $student->parentDetail->parent_email ?? '-' }}</div>
                                             </div>
                                             @else
-                                            <div class="p-3 bg-light rounded text-muted small fw-bold">Data orang tua belum dilengkapi.</div>
+                                            <div class="p-3 bg-light rounded text-muted small fw-bold">Data orang tua belum lengkap.</div>
                                             @endif
 
-                                            {{-- SECTION III: DATA SEKOLAH --}}
-                                            <div class="section-tag">III. Informasi Sekolah & Akademik</div>
+                                            {{-- SECTION III: INFORMASI SEKOLAH ASAL --}}
+                                            <div class="section-tag">III. Informasi Sekolah Asal</div>
                                             @if($student->schoolDetail)
                                             <div class="detail-item">
                                                 <div class="detail-label">Nama Sekolah</div>
@@ -272,15 +276,11 @@
                                                 <div class="detail-value">{{ $student->schoolDetail->graduation_year }}</div>
                                             </div>
                                             <div class="detail-item">
-                                                <div class="detail-label">Rata-rata Nilai</div>
-                                                <div class="detail-value">{{ number_format($student->schoolDetail->average_score ?? 0, 2) }}</div>
-                                            </div>
-                                            <div class="detail-item">
                                                 <div class="detail-label">Alamat Sekolah</div>
-                                                <div class="detail-value">{{ $student->schoolDetail->school_address ?? '-' }}</div>
+                                                <div class="detail-value small">{{ $student->schoolDetail->school_address ?? '-' }}</div>
                                             </div>
                                             @else
-                                            <div class="p-3 bg-light rounded text-muted small fw-bold">Data sekolah belum dilengkapi.</div>
+                                            <div class="p-3 bg-light rounded text-muted small fw-bold">Data sekolah belum lengkap.</div>
                                             @endif
                                         </div>
 
@@ -290,18 +290,18 @@
                                                 @if($currentStatus == 'DAFTAR')
                                                 <form action="{{ route('admin.verify', [$student->id, 'DITOLAK']) }}" method="POST" class="m-0">
                                                     @csrf @method('PATCH')
-                                                    <button type="submit" class="btn btn-outline-danger fw-bold px-4 btn-action" onclick="return confirm('Tolak pendaftaran ini?')">Tolak</button>
+                                                    <button type="submit" class="btn btn-outline-danger fw-bold px-4 btn-action">Tolak</button>
                                                 </form>
                                                 <form action="{{ route('admin.verify', [$student->id, 'TERVERIFIKASI']) }}" method="POST" class="m-0">
                                                     @csrf @method('PATCH')
                                                     <button type="submit" class="btn btn-success px-5 fw-bold shadow-sm btn-action" {{ !$isComplete ? 'disabled' : '' }}>
-                                                        Terima & Verifikasi
+                                                        Verifikasi
                                                     </button>
                                                 </form>
                                                 @else
                                                 <form action="{{ route('admin.verify', [$student->id, 'DAFTAR']) }}" method="POST" class="m-0">
                                                     @csrf @method('PATCH')
-                                                    <button type="submit" class="btn btn-secondary fw-bold px-4 btn-action">Reset ke Pendaftar</button>
+                                                    <button type="submit" class="btn btn-secondary fw-bold px-4 btn-action">Reset Status</button>
                                                 </form>
                                                 @endif
                                             </div>
