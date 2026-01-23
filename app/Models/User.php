@@ -19,6 +19,7 @@ class User extends Authenticatable
         'pob',
         'dob',
         'address',
+        'average_score',
         'role',
         'status'
     ];

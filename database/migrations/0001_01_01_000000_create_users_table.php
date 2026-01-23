@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('pob')->nullable(); 
             $table->date('dob')->nullable(); 
             $table->text('address')->nullable(); 
+            $table->decimal('average_score', 5, 2)->nullable();
             $table->string('role')->default('student'); 
 
             $table->string('status')->default('DAFTAR');
