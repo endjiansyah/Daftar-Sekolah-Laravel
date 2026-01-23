@@ -139,6 +139,16 @@
                             <i class="bi bi-shield-lock-fill me-2 text-danger"></i>Keamanan Akun
                         </h6>
 
+                        {{-- Letakkan tepat di bawah judul "Keamanan Akun" --}}
+                        @if (session('success_password'))
+                        <div class="alert alert-success d-flex align-items-center py-2 mb-3" style="font-size: 0.8rem; border: none; background-color: #d1e7dd; color: #0a3622;">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            <div>
+                                {{ session('success_password') }}
+                            </div>
+                        </div>
+                        @endif
+
                         <form action="{{ route('profile.password') }}" method="POST">
                             @csrf
                             @method('PUT')

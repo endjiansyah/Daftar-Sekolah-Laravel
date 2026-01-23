@@ -11,65 +11,44 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
         body {
-            background-color: #f8fafc;
+            background-color: #f1f5f9;
             font-family: 'Inter', sans-serif;
             color: #334155;
         }
 
         .navbar {
             background-color: #0f172a;
-            padding: 1rem 0;
+            padding: 0.8rem 0;
+            border-bottom: 4px solid #2563eb;
+        }
+
+        .navbar-brand img {
+            height: 35px;
+            margin-right: 12px;
         }
 
         .table-card {
             border: none;
-            border-radius: 12px;
+            border-radius: 16px;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            background: white;
         }
 
-        .modal-content {
-            border-radius: 20px;
-            border: none;
-            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-        }
-
-        .modal-header {
-            border-bottom: 1px solid #f1f5f9;
-            padding: 1.5rem 2rem;
-        }
-
-        .section-tag {
-            display: inline-block;
-            background: #eff6ff;
-            color: #2563eb;
+        .table thead th {
+            background-color: #f8fafc;
+            text-transform: uppercase;
             font-size: 0.75rem;
             font-weight: 700;
-            padding: 6px 12px;
-            border-radius: 6px;
-            margin: 1.5rem 0 1rem 0;
-            text-transform: uppercase;
-        }
-
-        .detail-item {
-            display: flex;
-            padding: 12px 0;
-            border-bottom: 1px solid #f1f5f9;
-            align-items: flex-start;
-        }
-
-        .detail-label {
-            width: 35%;
             color: #64748b;
-            font-size: 0.85rem;
-            font-weight: 500;
+            padding: 1rem;
         }
 
-        .detail-value {
-            width: 65%;
-            color: #1e293b;
-            font-size: 0.9rem;
-            font-weight: 600;
-            word-break: break-word;
+        .score-badge {
+            background-color: #f1f5f9;
+            color: #0f172a;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
         }
 
         .badge-status {
@@ -79,20 +58,40 @@
             font-weight: 600;
         }
 
-        .btn-action {
-            height: 34px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Highlight khusus untuk nilai */
-        .score-badge {
-            background-color: #f1f5f9;
-            color: #0f172a;
-            padding: 4px 8px;
+        /* --- CSS MODAL: SEMUA RATA KIRI --- */
+        .section-tag {
+            background: #f1f5f9;
+            padding: 8px 12px;
             border-radius: 6px;
             font-weight: 700;
+            font-size: 0.8rem;
+            color: #2563eb;
+            margin: 24px 0 12px 0;
+            text-transform: uppercase;
+        }
+
+        .detail-item {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #f8fafc;
+        }
+
+        .detail-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            font-weight: 500;
+            width: 35%;
+            /* Memberi ruang tetap untuk label di kiri */
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            color: #0f172a;
+            font-size: 0.9rem;
+            font-weight: 600;
+            width: 65%;
+            text-align: left;
+            /* Paksa rata kiri */
         }
     </style>
 </head>
@@ -100,11 +99,14 @@
 <body>
 
     <nav class="navbar navbar-dark mb-5 shadow-sm">
-        <div class="container d-flex justify-content-between">
-            <span class="navbar-brand fw-bold fs-4"><i class="bi bi-person-badge-fill me-2 text-primary"></i>ADMIN PPDB</span>
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="navbar-brand fw-bold d-flex align-items-center">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo">
+                <span>ADMIN PPDB</span>
+            </div>
             <form action="{{ route('logout') }}" method="POST" class="m-0">
                 @csrf
-                <button type="submit" class="btn btn-outline-danger btn-sm fw-bold">Logout</button>
+                <button type="submit" class="btn btn-outline-danger btn-sm fw-bold px-3">Logout</button>
             </form>
         </div>
     </nav>
@@ -120,6 +122,30 @@
             </div>
         </div>
 
+        <div class="card filter-card mb-4">
+            <div class="card-body p-4">
+                <form action="{{ route('admin.dashboard') }}" method="GET" class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Cari Siswa</label>
+                        <input type="text" name="search" class="form-control shadow-none" placeholder="Nama / NISN..." value="{{ request('search') }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Status</label>
+                        <select name="status" class="form-select shadow-none" onchange="this.form.submit()">
+                            <option value="">Semua Status</option>
+                            <option value="DAFTAR" {{ request('status') == 'DAFTAR' ? 'selected' : '' }}>DAFTAR</option>
+                            <option value="TERVERIFIKASI" {{ request('status') == 'TERVERIFIKASI' ? 'selected' : '' }}>TERVERIFIKASI</option>
+                            <option value="DITOLAK" {{ request('status') == 'DITOLAK' ? 'selected' : '' }}>DITOLAK</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary fw-bold w-100">Filter</button>
+                        <a href="{{ route('admin.dashboard') }}" class="btn btn-light border fw-bold w-100">Reset</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         @if(session('success'))
         <div class="alert alert-success border-0 shadow-sm mb-4"><i class="bi bi-check-circle me-2"></i>{{ session('success') }}</div>
         @endif
@@ -127,18 +153,18 @@
         <div class="alert alert-danger border-0 shadow-sm mb-4"><i class="bi bi-exclamation-triangle me-2"></i>{{ session('error') }}</div>
         @endif
 
-        <div class="card table-card">
+        <div class="card table-card shadow-sm">
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light">
+                        <thead>
                             <tr>
-                                <th class="ps-4 py-3 text-secondary" style="font-size: 0.8rem;">SISWA</th>
-                                <th class="text-secondary" style="font-size: 0.8rem;">NISN</th>
-                                <th class="text-secondary" style="font-size: 0.8rem;">ASAL SEKOLAH</th>
-                                <th class="text-secondary text-center" style="font-size: 0.8rem;">NILAI</th>
-                                <th class="text-secondary" style="font-size: 0.8rem;">STATUS</th>
-                                <th class="text-center px-4 text-secondary" style="font-size: 0.8rem;">AKSI</th>
+                                <th class="ps-4 py-3">SISWA</th>
+                                <th>NISN</th>
+                                <th>ASAL SEKOLAH</th>
+                                <th class="text-center">NILAI</th>
+                                <th>STATUS</th>
+                                <th class="text-center px-4">AKSI</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -165,23 +191,23 @@
                                 <td><span class="badge badge-status bg-{{ $color }} text-uppercase">{{ $currentStatus }}</span></td>
                                 <td class="text-center px-4">
                                     <div class="d-flex justify-content-center align-items-center gap-2">
-                                        <button class="btn btn-sm btn-white border shadow-sm px-3 btn-action" data-bs-toggle="modal" data-bs-target="#modal{{ $student->id }}">
+                                        <button class="btn btn-sm btn-white border shadow-sm px-3" data-bs-toggle="modal" data-bs-target="#modal{{ $student->id }}" style="height: 34px;">
                                             <i class="bi bi-eye text-primary me-1"></i> Detail
                                         </button>
 
                                         @if($currentStatus == 'DAFTAR' && $isComplete)
                                         <form action="{{ route('admin.verify', [$student->id, 'DITOLAK']) }}" method="POST" class="d-inline-block m-0">
                                             @csrf @method('PATCH')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger fw-bold px-3 shadow-sm btn-action" onclick="return confirm('Tolak pendaftaran ini?')">Tolak</button>
+                                            <button type="submit" class="btn btn-sm btn-outline-danger fw-bold px-3 shadow-sm" style="height: 34px;" onclick="return confirm('Tolak pendaftaran ini?')">Tolak</button>
                                         </form>
                                         <form action="{{ route('admin.verify', [$student->id, 'TERVERIFIKASI']) }}" method="POST" class="d-inline-block m-0">
                                             @csrf @method('PATCH')
-                                            <button type="submit" class="btn btn-sm btn-success fw-bold px-3 shadow-sm btn-action" onclick="return confirm('Verifikasi siswa ini?')">Verif</button>
+                                            <button type="submit" class="btn btn-sm btn-success fw-bold px-3 shadow-sm" style="height: 34px;" onclick="return confirm('Verifikasi siswa ini?')">Verifikasi</button>
                                         </form>
                                         @elseif($currentStatus != 'DAFTAR')
                                         <form action="{{ route('admin.verify', [$student->id, 'DAFTAR']) }}" method="POST" class="d-inline-block m-0">
                                             @csrf @method('PATCH')
-                                            <button type="submit" class="btn btn-sm btn-secondary fw-bold px-3 shadow-sm btn-action" onclick="return confirm('Kembalikan status ke Daftar?')">
+                                            <button type="submit" class="btn btn-sm btn-secondary fw-bold px-3 shadow-sm" style="height: 34px;" onclick="return confirm('Kembalikan status ke Daftar?')">
                                                 <i class="bi bi-arrow-counterclockwise"></i> Reset
                                             </button>
                                         </form>
@@ -189,7 +215,7 @@
                                     </div>
                                 </td>
                             </tr>
-
+                            {{-- MODAL DETAIL: 100% DATA UTUH --}}
                             <div class="modal fade" id="modal{{ $student->id }}" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
                                     <div class="modal-content">
@@ -199,7 +225,6 @@
                                         </div>
                                         <div class="modal-body px-4 pb-4">
 
-                                            {{-- SECTION I: DATA PRIBADI & AKADEMIK --}}
                                             <div class="section-tag">I. Data Pribadi & Akademik</div>
                                             <div class="detail-item">
                                                 <div class="detail-label">Nama Lengkap</div>
@@ -237,7 +262,6 @@
                                                 <div class="detail-value small">{{ $student->address ?? '-' }}</div>
                                             </div>
 
-                                            {{-- SECTION II: DATA ORANG TUA / WALI --}}
                                             <div class="section-tag">II. Data Orang Tua / Wali</div>
                                             @if($student->parentDetail)
                                             <div class="detail-item">
@@ -260,7 +284,6 @@
                                             <div class="p-3 bg-light rounded text-muted small fw-bold">Data orang tua belum lengkap.</div>
                                             @endif
 
-                                            {{-- SECTION III: INFORMASI SEKOLAH ASAL --}}
                                             <div class="section-tag">III. Informasi Sekolah Asal</div>
                                             @if($student->schoolDetail)
                                             <div class="detail-item">
@@ -285,23 +308,23 @@
                                         </div>
 
                                         <div class="modal-footer border-0 p-4 pt-0 d-flex justify-content-between">
-                                            <button type="button" class="btn btn-light fw-bold px-4 btn-action" data-bs-dismiss="modal">Tutup</button>
+                                            <button type="button" class="btn btn-light fw-bold px-4 shadow-sm" data-bs-dismiss="modal">Tutup</button>
                                             <div class="d-flex gap-2">
                                                 @if($currentStatus == 'DAFTAR')
                                                 <form action="{{ route('admin.verify', [$student->id, 'DITOLAK']) }}" method="POST" class="m-0">
                                                     @csrf @method('PATCH')
-                                                    <button type="submit" class="btn btn-outline-danger fw-bold px-4 btn-action">Tolak</button>
+                                                    <button type="submit" class="btn btn-outline-danger fw-bold px-4 shadow-sm">Tolak</button>
                                                 </form>
                                                 <form action="{{ route('admin.verify', [$student->id, 'TERVERIFIKASI']) }}" method="POST" class="m-0">
                                                     @csrf @method('PATCH')
-                                                    <button type="submit" class="btn btn-success px-5 fw-bold shadow-sm btn-action" {{ !$isComplete ? 'disabled' : '' }}>
+                                                    <button type="submit" class="btn btn-success px-5 fw-bold shadow-sm" {{ !$isComplete ? 'disabled' : '' }}>
                                                         Verifikasi
                                                     </button>
                                                 </form>
                                                 @else
                                                 <form action="{{ route('admin.verify', [$student->id, 'DAFTAR']) }}" method="POST" class="m-0">
                                                     @csrf @method('PATCH')
-                                                    <button type="submit" class="btn btn-secondary fw-bold px-4 btn-action">Reset Status</button>
+                                                    <button type="submit" class="btn btn-secondary fw-bold px-4 shadow-sm">Reset Status</button>
                                                 </form>
                                                 @endif
                                             </div>
