@@ -182,8 +182,8 @@
                                 <td class="fw-medium">{{ $student->nisn ?? '-' }}</td>
                                 <td class="small">{{ $student->schoolDetail->school_name ?? '-' }}</td>
                                 <td class="text-center">
-                                    @if($student->schoolDetail && $student->schoolDetail->average_score)
-                                    <span class="score-badge">{{ number_format($student->schoolDetail->average_score, 2) }}</span>
+                                    @if($student->average_score)
+                                    <span class="score-badge">{{ number_format($student->average_score, 2) }}</span>
                                     @else
                                     <span class="text-muted small">-</span>
                                     @endif
