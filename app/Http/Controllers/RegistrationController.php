@@ -38,6 +38,7 @@ class RegistrationController extends Controller
             'full_name'         => 'required|string',
             'nisn'              => 'nullable|digits:10|unique:users,nisn', // Tepat 10 digit
             'pob'               => 'nullable|exists:cities,id',
+            'average_score'   => 'nullable|numeric|between:0,100',
         ];
 
         // 2. Tambah Validasi jika Tipe Pendaftaran 'Lengkap'
@@ -81,7 +82,7 @@ class RegistrationController extends Controller
                 'pob'           => $request->pob,
                 'dob'           => $request->dob,
                 'address'       => $request->address,
-                'average_score' => $request->registration_type === 'complete' ? $request->average_score : null,
+                'average_score' => $request->average_score,
                 'role'          => \App\Enums\UserRole::STUDENT, // Pastikan Enum ini sesuai projectmu
                 'status'        => RegistrationStatus::DAFTAR,
             ]);
